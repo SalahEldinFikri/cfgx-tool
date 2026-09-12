@@ -56,11 +56,12 @@ Malware configuration extraction often requires several different stages:
 1. Scan the malware with YARA.
 2. Identify interesting matches.
 3. Locate those matches inside the executable.
-4. Resolve PE information such as sections and RVAs.
-5. Read additional bytes from the sample.
-6. Decode or decrypt the data.
-7. Build a configuration object.
-8. Save the extracted configuration.
+4. PE and ELF executable format support
+5. Resolve PE information such as sections and RVAs.
+6. Read additional bytes from the sample.
+7. Decode or decrypt the data.
+8. Build a configuration object.
+9. Save the extracted configuration.
 
 `cfgx` provides the common infrastructure required for these operations.
 
@@ -132,7 +133,7 @@ The overall pipeline is:
                  Load plugin
                        │
                        ▼
-                  Load PE
+                  Load PE, ELF
                        │
                        ▼
                  Run YARA
@@ -203,8 +204,10 @@ cfgx commandline tool/
 │
 ├── formats/
 │   ├── __init__.py
-│   └── pe.py
-│
+│   ├── pe.py
+|   ├── elf.py
+│   ├── detect.py
+|
 ├── yara_handler/
 │   ├── __init__.py
 │   └── runner.py
@@ -241,6 +244,7 @@ The project was tested with:
 Python 3.12
 yara-python 4.5.4
 pefile 2024.8.26
+pyelftools>=0.32
 ```
 
 ---
