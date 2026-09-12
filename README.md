@@ -1723,12 +1723,17 @@ Python >= 3.12
 
 # License
 
-Add the project's chosen license here before public release.
+## License
 
-For example:
+**cfgx** is released under the **MaTriX Non-Commercial License (MNCL) v1.0**.
 
-```text
-MIT License
-```
+Copyright (c) 2026 SalahEldin Kamil
+All Rights Reserved.
 
-if the project is intended to use the MIT license.
+The license permits use, copying, study, modification, and redistribution of the software for **non-commercial purposes**, subject to the terms of the license. Commercial use requires a separate written commercial license from the copyright holder.
+Attribution and the original copyright notice must be retained in copies and derivative works.
+
+For the complete terms and conditions, see the [`LICENSE`](LICENSE) file included in this repository.
+
+For commercial licensing inquiries, contact the copyright holder.
+

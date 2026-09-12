@@ -1,0 +1,248 @@
+# MaTriX Non-Commercial License (MNCL) v1.0
+
+Copyright (c) 2026 SalahEldin Kamil
+All Rights Reserved.
+
+## 1. Definitions
+
+For the purposes of this License:
+
+**"Software"** means the source code, object code, documentation, configuration files, scripts, and other materials distributed by the copyright holder under this License.
+
+**"Original Software"** means the Software as originally published by the copyright holder.
+
+**"Derivative Work"** means any work based upon, derived from, modified from, or incorporating a substantial portion of the Original Software.
+
+**"Copyright Holder"** means SalahEldin Kamil and any successor or assignee of the applicable copyright rights.
+
+**"Commercial Use"** means any use primarily intended for or directed toward commercial advantage, monetary compensation, revenue generation, or operation of a commercial business or service.
+
+## 2. Copyright Ownership
+
+The Original Software and its original components are protected by applicable copyright and other intellectual-property laws.
+
+Copyright in the Original Software remains with the Copyright Holder.
+
+Nothing in this License transfers ownership of the Original Software or its copyright to any recipient.
+
+The rights granted by this License are permissions to use the Software under the conditions stated herein and do not constitute a transfer of ownership.
+
+## 3. Non-Commercial License Grant
+
+Subject to compliance with this License, the Copyright Holder grants you a worldwide, non-exclusive, royalty-free, non-transferable license to:
+
+* Use the Software for non-commercial purposes;
+* Copy the Software;
+* Study and inspect the Software;
+* Modify the Software;
+* Create Derivative Works for non-commercial purposes; and
+* Redistribute the Software and permitted Derivative Works for non-commercial purposes.
+
+These permissions apply only while you comply with all terms of this License.
+
+## 4. Permitted Non-Commercial Uses
+
+Permitted uses include, but are not limited to:
+
+* Personal projects;
+* Personal experimentation;
+* Education and teaching;
+* Academic study;
+* Academic research;
+* Non-commercial security research;
+* Testing and evaluation;
+* Demonstrations;
+* Non-commercial open-source projects; and
+* Other activities that do not constitute Commercial Use.
+
+The fact that the Software is used by an individual, organization, school, university, research group, or company does not by itself determine whether the use is commercial. The nature and purpose of the use must be considered.
+
+## 5. Attribution Requirement
+
+Every copy, redistribution, or Derivative Work must retain the following:
+
+**Copyright (c) 2026 SalahEldin Kamil**
+
+and must include a copy of this License.
+
+Where reasonably possible, the following attribution must also be displayed:
+
+**"Original software created by SalahEldin Kamil."**
+
+Attribution must not be removed, hidden, altered, or presented in a manner that falsely suggests that the Original Software was created by another person or organization.
+
+If a Derivative Work is publicly distributed, its documentation or repository must clearly identify that it is derived from the Original Software.
+
+## 6. Prohibited Commercial Use
+
+The License does NOT grant any right to use the Software for Commercial Use.
+
+Without a separate written commercial license from the Copyright Holder, you may not:
+
+1. Sell the Software;
+2. Sell a Derivative Work;
+3. License or sublicense the Software for commercial purposes;
+4. Include the Software or a substantial portion of it in a product or service offered for payment;
+5. Use the Software to provide a paid service to third parties;
+6. Offer the Software as a paid hosted, cloud, SaaS, or API service;
+7. Monetize access to functionality substantially derived from the Software;
+8. Use the Software as a material component of a commercial product;
+9. Use the Software for the primary purpose of generating revenue;
+10. Distribute the Software as part of a commercial package where the Software materially contributes to the value of that package; or
+11. Grant another person or organization rights to commercially use the Software.
+
+The above restrictions apply to the Original Software and to Derivative Works to the extent that they contain or are substantially based upon the Original Software.
+
+## 7. Commercial Licensing
+
+Commercial use may be authorized only through a separate written agreement with the Copyright Holder.
+
+The Copyright Holder may, at their sole discretion, grant commercial licenses under separately negotiated terms.
+
+A commercial license may include:
+
+* One-time licensing fees;
+* Subscription fees;
+* Per-user or per-installation fees;
+* Revenue-sharing arrangements;
+* Royalties;
+* Distribution fees;
+* Enterprise licensing fees;
+* Restrictions on redistribution;
+* Support and maintenance fees; or
+* Other mutually agreed commercial terms.
+
+No payment, contribution, donation, sponsorship, or other transaction automatically grants commercial rights.
+
+Commercial rights exist only when expressly granted in a written agreement signed or otherwise formally accepted by the Copyright Holder.
+
+## 8. Modification and Derivative Works
+
+You may modify the Software for permitted non-commercial purposes.
+
+Any publicly distributed Derivative Work must:
+
+* Retain the original copyright notice;
+* Include this License;
+* Clearly identify that it is a modified or derivative version;
+* Provide attribution to SalahEldin Kamil; and
+* Not falsely represent the Derivative Work as the Original Software.
+
+Modification of the Software does not transfer ownership of the Original Software to the modifier.
+
+You retain ownership of your independently created original modifications to the extent provided by applicable law, but such ownership does not grant you the right to commercially exploit the Original Software or any portion of it where this License prohibits such use.
+
+## 9. Redistribution
+
+You may redistribute the Original Software or permitted Derivative Works for non-commercial purposes provided that:
+
+* This License accompanies the distribution;
+* The original copyright notice is preserved;
+* Required attribution is preserved;
+* You do not represent yourself as the original author of the Software;
+* You do not remove or obscure notices concerning copyright or licensing; and
+* The redistribution does not constitute Commercial Use.
+
+You may not charge a license fee, subscription fee, access fee, or other commercial fee for the Software itself or for access to functionality substantially based upon it.
+
+Reasonable costs directly associated with physical media or distribution do not by themselves constitute Commercial Use, provided that no commercial rights are otherwise granted.
+
+## 10. No Sublicensing
+
+You may not sublicense the Software.
+
+You may not grant any third party rights broader than those granted to you by this License.
+
+In particular, you may not grant another person or organization commercial rights to the Software.
+
+## 11. Contributions
+
+If you voluntarily submit code, documentation, bug fixes, rules, signatures, or other material intended to be incorporated into the Software, you represent that you have the necessary rights to submit that material.
+
+Unless a separate written agreement states otherwise, you grant the Copyright Holder a perpetual, worldwide, non-exclusive, royalty-free license to use, reproduce, modify, distribute, sublicense, and otherwise incorporate your contribution into the Software.
+
+You remain responsible for ensuring that your contribution does not knowingly violate the intellectual-property rights of another party.
+
+## 12. Third-Party Components
+
+The Software may contain, depend upon, or interact with third-party software, libraries, tools, data, or other materials.
+
+Third-party components may be subject to their own licenses.
+
+Nothing in this License overrides or changes the terms of a third-party license.
+
+Where applicable, the original third-party copyright notices and license terms must be preserved.
+
+This License applies only to material for which the Copyright Holder has the necessary rights to grant this License.
+
+## 13. Trademarks and Branding
+
+This License does not grant permission to use the Copyright Holder's trademarks, logos, project names, or other branding except where reasonably necessary to identify the Software or comply with the attribution requirements of this License.
+
+Use of the project name or branding must not imply endorsement, sponsorship, partnership, or affiliation with the Copyright Holder without prior written permission.
+
+## 14. No False Attribution
+
+You may not:
+
+* Claim that you created the Original Software;
+* Remove the identity of the Original Author;
+* Present the Original Software as entirely your own work;
+* Register the Original Software as your own copyrighted work where doing so would falsely claim authorship; or
+* Make a misleading statement about your relationship with the Copyright Holder.
+
+You may identify yourself as the author of your own independent modifications, provided that the Original Author and Original Software are clearly acknowledged.
+
+## 15. Termination
+
+The rights granted by this License automatically terminate if you materially violate its terms.
+
+Upon termination, you must cease exercising the rights granted by this License and, where legally required, cease further distribution or use of the Software.
+
+Termination does not prevent the Copyright Holder from pursuing any rights or remedies available under applicable law.
+
+Rights that cannot legally be terminated under applicable law remain unaffected.
+
+## 16. Reservation of Rights
+
+All rights not expressly granted by this License are reserved by the Copyright Holder.
+
+In particular, the Copyright Holder reserves all rights concerning:
+
+* Commercial exploitation;
+* Commercial licensing;
+* Commercial distribution;
+* Sale of the Software;
+* Sublicensing for commercial purposes;
+* Commercial derivative products; and
+* Other uses not expressly permitted by this License.
+
+## 17. Disclaimer of Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, OR RELIABILITY.
+
+THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.
+
+## 18. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, REVENUE, DATA, BUSINESS, OR OTHER ECONOMIC LOSS ARISING FROM THE USE OF OR INABILITY TO USE THE SOFTWARE.
+
+## 19. Applicable Law and Enforcement
+
+This License is intended to provide copyright permissions and restrictions that may be enforced to the maximum extent permitted by applicable law.
+
+Nothing in this License limits any rights or remedies available to the Copyright Holder under applicable copyright, intellectual-property, contract, or other applicable law.
+
+The Copyright Holder may seek appropriate legal remedies for unauthorized use, reproduction, distribution, commercial exploitation, or other infringement of the Software, subject to the laws and procedures applicable to the relevant jurisdiction.
+
+## 20. Acceptance
+
+By exercising any rights granted by this License, you acknowledge that you have read, understood, and agreed to comply with its terms.
+
+If you do not agree to these terms, you are not granted the permissions described in this License.
+
+---
+
+**Copyright (c) 2026 SalahEldin Kamil. All Rights Reserved.**
+
+For commercial licensing inquiries, contact the Copyright Holder.
