@@ -435,8 +435,17 @@ For each sample, cfgx loads the PE using `pefile`.
 The PE information is then used to enrich YARA match offsets.
 
 ---
+## 4. ELF
 
-## 4. YARA scanning
+
+
+* ELF loading
+* section identification
+* virtual address resolution
+* file offset to virtual address resolution
+  
+---
+## 5. YARA scanning
 
 The YARA rule is compiled and executed against the sample.
 
@@ -444,7 +453,7 @@ Every individual YARA string instance is converted into a generic match structur
 
 ---
 
-## 5. PE metadata enrichment
+## 6. PE metadata enrichment
 
 The file offset from YARA can be resolved into:
 
@@ -456,7 +465,7 @@ This additional information is supplied to the analyst plugin.
 
 ---
 
-## 6. SampleReader
+## 7. SampleReader
 
 The framework creates a `SampleReader`.
 
@@ -472,7 +481,7 @@ The plugin does not receive the sample path or file handle.
 
 ---
 
-## 7. Analyst extraction
+## 8. Analyst extraction
 
 The framework calls:
 
@@ -492,7 +501,7 @@ The plugin decides:
 
 ---
 
-## 8. Result validation
+## 9. Result validation
 
 cfgx validates the result returned by the plugin.
 
@@ -509,7 +518,7 @@ config
 
 ---
 
-## 9. Output
+## 10. Output
 
 The result is shown in the terminal and saved as JSON.
 
