@@ -1,0 +1,2 @@
+[console_scripts]
+cfgx = cfgx.cli:main
