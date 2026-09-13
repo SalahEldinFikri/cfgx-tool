@@ -35,6 +35,7 @@ The actual malware-specific extraction logic is implemented by an external analy
 * [YARA Processing](#yara-processing)
 * [PE Processing](#pe-processing)
 * [SampleReader](#samplereader)
+* [Algorithms](#algorithms)
 * [Analyst Plugin](#analyst-plugin)
 * [Plugin Result Contract](#plugin-result-contract)
 * [Terminal Output](#terminal-output)
@@ -56,16 +57,24 @@ Malware configuration extraction often requires several different stages:
 1. Scan the malware with YARA.
 2. Identify interesting matches.
 3. Locate those matches inside the executable.
-4. PE and ELF executable format support
-5. Resolve PE information such as sections and RVAs.
+4. Detect and load the PE or ELF executable format.
+5. Resolve executable metadata such as sections, RVAs, and virtual addresses.
 6. Read additional bytes from the sample.
-7. Decode or decrypt the data.
+7. Decode, decrypt, transform, or otherwise process the data.
 8. Build a configuration object.
 9. Save the extracted configuration.
 
 `cfgx` provides the common infrastructure required for these operations.
 
 The malware-specific logic is delegated to an analyst plugin.
+
+The framework also provides a reusable algorithm library. The plugin can use
+Base16, Base32, Base45, Base58, Base64, Base85, XOR, Rolling XOR, RC4, AES,
+DES, 3DES, Blowfish, ChaCha20, ChaCha20-Poly1305, MD5, SHA1, and SHA256.
+
+The important distinction is that cfgx provides the algorithm mechanics while
+the analyst plugin decides which algorithm the malware uses, which parameters
+are required, and in what order multiple algorithms must be applied.
 
 For example, a plugin can decide that:
 
@@ -200,7 +209,24 @@ cfgx commandline tool/
 │   ├── main.py
 │   ├── plugin.py
 │   ├── reader.py
-│   └── models.py
+│   ├── models.py
+│   └── algorithms/
+│       ├── __init__.py
+│       ├── base16.py
+│       ├── base32.py
+│       ├── base45.py
+│       ├── base58.py
+│       ├── base64.py
+│       ├── base85.py
+│       ├── xor.py
+│       ├── xor_rolling.py
+│       ├── rc4.py
+│       ├── aes.py
+│       ├── des.py
+│       ├── 3des.py
+│       ├── blowfish.py
+│       ├── chacha20.py
+│       └── chacha20_poly1305.py
 │
 ├── formats/
 │   ├── __init__.py
@@ -236,6 +262,8 @@ Main dependencies:
 ```text
 yara-python >= 4.5.0
 pefile >= 2024.8.26
+pyelftools >= 0.32
+pycryptodome >= 3.20.0
 ```
 
 The project was tested with:
@@ -244,8 +272,12 @@ The project was tested with:
 Python 3.12
 yara-python 4.5.4
 pefile 2024.8.26
-pyelftools>=0.32
+pyelftools 0.32
+pycryptodome 3.23.0
 ```
+
+`pycryptodome` provides the implementations used by the AES, DES, 3DES,
+Blowfish, ChaCha20, and ChaCha20-Poly1305 helpers.
 
 ---
 
@@ -257,7 +289,10 @@ Clone or copy the project and install it in editable mode:
 py -3.12 -m pip install -e .
 ```
 
-The editable installation provides the `cfgx` command.
+The editable installation registers the `cfgx` command in the Python
+environment while keeping the package linked to the source tree. This is
+useful during development because changes to the source are immediately
+available to the installed command.
 
 Verify the installation:
 
@@ -403,7 +438,9 @@ results/
 
 # How cfgx Works
 
-The framework consists of several stages.
+The framework consists of several stages. Every sample passes through the
+same pipeline. The framework handles the generic stages, while the analyst
+plugin owns the malware-family-specific extraction step.
 
 ## 1. CLI validation
 
@@ -414,7 +451,7 @@ The CLI verifies that:
 * the sample path exists
 * the sample path is either a file or directory
 * the analyst plugin exists
-* the analyst plugin is a file
+* the analyst plugin is a Python file
 
 ---
 
@@ -422,46 +459,95 @@ The CLI verifies that:
 
 The external plugin is dynamically loaded by cfgx.
 
-The plugin is not hard-coded into the framework.
+The plugin is not hard-coded into the framework. This allows an analyst to
+create a malware-family-specific extractor without modifying cfgx itself.
 
-This allows an analyst to create a malware-family-specific extractor without modifying cfgx itself.
+The framework verifies that the plugin exposes a callable:
+
+```python
+extract(matches, reader)
+```
+
+function before extraction begins.
 
 ---
 
-## 3. PE loading
+## 3. PE / ELF loading
 
-For each sample, cfgx loads the PE using `pefile`.
+cfgx detects the executable format and loads the appropriate parser.
 
-The PE information is then used to enrich YARA match offsets.
+For PE samples, cfgx uses `pefile` to resolve:
+
+```text
+file offset
+    ↓
+PE section
+    ↓
+RVA
+    ↓
+VA
+```
+
+For ELF samples, cfgx uses `pyelftools` to resolve:
+
+```text
+file offset
+    ↓
+ELF section
+    ↓
+VA
+```
+
+This allows the same plugin architecture to work with both Windows PE and
+Linux/IoT ELF samples.
 
 ---
-## 4. ELF
 
-
-
-* ELF loading
-* section identification
-* virtual address resolution
-* file offset to virtual address resolution
-  
----
-## 5. YARA scanning
+## 4. YARA scanning
 
 The YARA rule is compiled and executed against the sample.
 
-Every individual YARA string instance is converted into a generic match structure.
+Every individual YARA string occurrence becomes a separate normalized match.
+If `$steamid` occurs three times, cfgx produces three independent match
+objects.
 
 ---
 
-## 6. PE metadata enrichment
+## 5. Match normalization
 
-The file offset from YARA can be resolved into:
+Raw YARA results are converted into a stable generic structure:
 
-* PE section
-* RVA
-* virtual address
+```python
+{
+    "rule": "...",
+    "identifier": "$config",
+    "offset": 450664
+}
+```
 
-This additional information is supplied to the analyst plugin.
+This gives the analyst plugin a predictable interface.
+
+---
+
+## 6. Executable metadata resolution
+
+For PE files, cfgx enriches matches with:
+
+```text
+section
+rva
+va
+```
+
+For ELF files, cfgx can provide:
+
+```text
+section
+va
+```
+
+The metadata is useful when cross-referencing a YARA match with IDA,
+Ghidra, a debugger, or reverse-engineering notes.
 
 ---
 
@@ -469,15 +555,15 @@ This additional information is supplied to the analyst plugin.
 
 The framework creates a `SampleReader`.
 
-The plugin can use:
+The plugin accesses sample bytes only through:
 
 ```python
 reader.read(offset, size)
 ```
 
-to request bytes from the sample.
+The plugin does not receive the sample path or raw file handle.
 
-The plugin does not receive the sample path or file handle.
+This keeps file access under the framework's reader abstraction.
 
 ---
 
@@ -489,15 +575,38 @@ The framework calls:
 extract(matches, reader)
 ```
 
+This is the malware-family-specific step.
+
 The plugin decides:
 
 * which matches are interesting
 * which offsets should be read
 * how many bytes should be read
-* whether the bytes are encrypted
-* how they should be decrypted
-* how they should be decoded
+* whether the data is encoded, encrypted, or transformed
+* which cfgx algorithm is required
+* which key, IV, nonce, or other parameters are required
+* the order of multiple algorithms
+* how the resulting bytes should be interpreted
 * what configuration structure should be returned
+
+For example:
+
+```text
+YARA match
+    ↓
+reader.read()
+    ↓
+Base64 decode
+    ↓
+RC4
+    ↓
+plaintext
+    ↓
+configuration
+```
+
+The framework does not automatically choose this sequence. The analyst
+determines it from reverse engineering of the malware.
 
 ---
 
@@ -514,13 +623,17 @@ config
 
 `status` must be a string.
 
-`config` is intentionally unrestricted.
+`config` is intentionally unrestricted so each malware family can expose the
+configuration structure that makes sense for that family.
 
 ---
 
 ## 10. Output
 
 The result is shown in the terminal and saved as JSON.
+
+For directory analysis, cfgx waits for the samples to be processed and then
+writes the combined rule-level report.
 
 ---
 
@@ -721,6 +834,428 @@ b""
 ```
 
 is returned.
+
+---
+
+# Algorithms
+
+cfgx includes a reusable algorithm library for configuration extraction.
+
+The library is intentionally separate from malware-family-specific plugins.
+The framework provides the mechanics; the analyst plugin decides how those
+mechanics reproduce the malware's implementation.
+
+## Algorithm Categories
+
+```text
+Encodings
+    Base16
+    Base32
+    Base45
+    Base58
+    Base64
+    Base85
+
+Transforms
+    XOR
+    Single-byte XOR
+    Rolling XOR
+
+Ciphers
+    RC4
+    AES
+    DES
+    3DES
+    Blowfish
+    ChaCha20
+    ChaCha20-Poly1305
+
+Hashes
+    MD5
+    SHA1
+    SHA256
+```
+
+## Encodings
+
+### Base16
+
+Base16 represents bytes as hexadecimal characters.
+
+```text
+48 65 6c 6c 6f
+      ↓
+48656c6c6f
+```
+
+The plugin can decode the value back into raw bytes before passing those bytes
+to another processing stage.
+
+### Base32
+
+Base32 represents binary data using a restricted text alphabet.
+
+```text
+Base32 text
+    ↓
+Base32 decode
+    ↓
+raw bytes
+```
+
+### Base45
+
+Base45 is a byte-to-text encoding. cfgx provides encoding and decoding with
+validation of malformed input.
+
+### Base58
+
+Base58 uses a reduced alphabet and can be useful when malware stores binary
+data or identifiers in a printable representation.
+
+### Base64
+
+Base64 is commonly encountered during malware configuration extraction.
+
+Example:
+
+```python
+from cfgx.algorithms.base64 import decode as base64_decode
+
+decoded = base64_decode(encoded)
+```
+
+The result is raw bytes and can be passed to another algorithm.
+
+### Base85
+
+Base85 provides another binary-to-text encoding. cfgx also provides ASCII85
+helpers.
+
+---
+
+## Transforms
+
+### XOR
+
+The repeating-key XOR helper applies a key repeatedly across the input.
+
+```python
+from cfgx.algorithms.xor import xor
+
+plaintext = xor(data, key)
+```
+
+XOR is reversible using the same key:
+
+```text
+ciphertext XOR key = plaintext
+plaintext  XOR key = ciphertext
+```
+
+### Single-byte XOR
+
+Single-byte XOR uses one byte as the key.
+
+```python
+from cfgx.algorithms.xor import xor_single_byte
+
+plaintext = xor_single_byte(data, 0x5A)
+```
+
+### Rolling XOR
+
+Rolling XOR changes the key as processing continues.
+
+```text
+initial key
+    ↓
+XOR byte
+    ↓
+increment key
+    ↓
+XOR next byte
+    ↓
+...
+```
+
+Example:
+
+```python
+from cfgx.algorithms.xor_rolling import rolling_xor
+
+plaintext = rolling_xor(data, key, increment)
+```
+
+The analyst must determine the initial key and increment from the malware.
+
+---
+
+## Ciphers
+
+### RC4
+
+RC4 is a stream cipher frequently encountered in malware.
+
+Example:
+
+```python
+from cfgx.algorithms.rc4 import rc4
+
+plaintext = rc4(ciphertext, key)
+```
+
+A malware may use multiple processing stages:
+
+```python
+from cfgx.algorithms.base64 import decode as base64_decode
+from cfgx.algorithms.rc4 import rc4
+
+decoded = base64_decode(encoded)
+plaintext = rc4(decoded, "74934157919546113795")
+```
+
+The important part is that the plugin knows the malware's actual sequence and
+key. cfgx only provides the reusable implementations.
+
+### AES
+
+cfgx supports:
+
+```text
+ECB
+CBC
+CTR
+```
+
+with AES key sizes of:
+
+```text
+16 bytes
+24 bytes
+32 bytes
+```
+
+CBC uses a 16-byte IV.
+
+The analyst must identify the correct mode, key, and IV/parameters from the
+malware.
+
+### DES
+
+DES is a block cipher with an 8-byte block size.
+
+cfgx supports:
+
+```text
+ECB
+CBC
+```
+
+with an 8-byte key. CBC requires an 8-byte IV.
+
+### 3DES
+
+3DES supports:
+
+```text
+ECB
+CBC
+```
+
+with supported 16-byte or 24-byte keys. CBC uses an 8-byte IV.
+
+### Blowfish
+
+Blowfish is a symmetric block cipher with a variable-length key.
+
+cfgx supports:
+
+```text
+ECB
+CBC
+```
+
+with supported key sizes from 4 through 56 bytes. CBC uses an 8-byte IV.
+
+### ChaCha20
+
+ChaCha20 is a stream cipher. The plugin supplies the key and nonce required
+by the malware's implementation.
+
+```text
+ciphertext
+    +
+key
+    +
+nonce
+    ↓
+ChaCha20
+    ↓
+plaintext
+```
+
+### ChaCha20-Poly1305
+
+ChaCha20-Poly1305 combines encryption with authentication.
+
+Depending on the malware's data format, the plugin may need:
+
+```text
+key
+nonce
+ciphertext
+authentication tag
+associated data
+```
+
+Authenticated decryption requires the authentication information to validate.
+
+---
+
+## Hashes
+
+Hashes are different from encryption. They produce digests and are not
+normally reversible.
+
+cfgx provides:
+
+```text
+MD5
+SHA1
+SHA256
+```
+
+They can be used by plugins to reproduce or verify malware-derived values.
+
+### MD5
+
+```python
+from cfgx.algorithms.md5 import hexdigest
+
+value = hexdigest(data)
+```
+
+### SHA1
+
+```python
+from cfgx.algorithms.sha1 import hexdigest
+
+value = hexdigest(data)
+```
+
+### SHA256
+
+```python
+from cfgx.algorithms.sha256 import hexdigest
+
+value = hexdigest(data)
+```
+
+For example, SHA256 of `Hello World` is:
+
+```text
+a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+```
+
+---
+
+## Using Algorithms in the Analyst Plugin
+
+The plugin imports only the algorithms it needs.
+
+For example:
+
+```python
+from cfgx.algorithms.base64 import decode as base64_decode
+from cfgx.algorithms.rc4 import rc4
+```
+
+Then the plugin can build the malware-specific processing chain:
+
+```python
+def extract(matches, reader):
+    results = []
+
+    for match in matches:
+        if match["identifier"] != "$config":
+            continue
+
+        encoded = reader.read(match["offset"], 128)
+
+        decoded = base64_decode(encoded)
+        plaintext = rc4(decoded, "key")
+
+        results.append({
+            "value": plaintext
+        })
+
+    return {
+        "status": "success",
+        "config": results
+    }
+```
+
+The framework knows how to perform Base64 decoding and RC4, but only the
+plugin knows:
+
+```text
+which match matters
+which bytes contain the data
+which key is correct
+which algorithm is correct
+which order to use
+how to interpret the result
+```
+
+## Multi-Stage Algorithms
+
+Malware configurations can contain several processing stages.
+
+For example:
+
+```text
+YARA match
+    ↓
+SampleReader
+    ↓
+Base64 decode
+    ↓
+XOR
+    ↓
+RC4
+    ↓
+plaintext
+    ↓
+configuration parser
+```
+
+The plugin can represent that sequence directly:
+
+```python
+encoded = reader.read(match["offset"], size)
+
+stage1 = base64_decode(encoded)
+stage2 = xor(stage1, xor_key)
+stage3 = rc4(stage2, rc4_key)
+```
+
+The order matters. If reverse engineering shows:
+
+```text
+Base64 → RC4
+```
+
+the extractor must perform:
+
+```text
+Base64 decode → RC4
+```
+
+The framework does not automatically try every available algorithm.
+
+That would mix malware-family-specific reasoning into the generic framework and
+could produce false positives.
 
 ---
 
@@ -1272,9 +1807,8 @@ The `config` field intentionally uses a generic object type because the analyst 
 
 Initializes the `formats` package.
 
-The package is intended to contain format-specific parsing functionality.
-
-Currently the implemented format handler is PE.
+The package contains executable-format-specific parsing functionality for PE
+and ELF samples.
 
 ---
 
@@ -1291,6 +1825,22 @@ It handles:
 * enriching YARA matches with PE metadata
 
 This keeps PE parsing out of the core orchestration code.
+
+---
+
+## `formats/elf.py`
+
+ELF-specific functionality.
+
+It handles:
+
+* loading ELF files
+* identifying ELF sections
+* file-offset to virtual-address conversion
+* resolving ELF virtual addresses
+
+This provides the equivalent format support for Linux and other ELF-based
+samples.
 
 ---
 
@@ -1351,6 +1901,27 @@ It is a development/testing artifact rather than part of the framework's normal 
 
 ---
 
+## `cfgx/algorithms/`
+
+The reusable algorithm library.
+
+It contains independent implementations for:
+
+```text
+Base16, Base32, Base45, Base58, Base64, Base85
+XOR, single-byte XOR, Rolling XOR
+RC4
+AES, DES, 3DES, Blowfish
+ChaCha20, ChaCha20-Poly1305
+MD5, SHA1, SHA256
+```
+
+Each module is intended to be imported only when the analyst plugin needs it.
+The algorithm library contains generic mechanics; malware-family-specific
+selection and parameter recovery remain in the analyst plugin.
+
+---
+
 ## `decryptor.py`
 
 A development/experimental extraction-related file used during the earlier stages of the project.
@@ -1384,7 +1955,12 @@ Dependencies include:
 ```text
 yara-python
 pefile
+pyelftools
+pycryptodome
 ```
+
+`pycryptodome` supplies the cryptographic primitives used by the supported
+cipher helpers.
 
 The CLI entry point is:
 
@@ -1480,6 +2056,40 @@ The plugin system has been tested with:
 
 ---
 
+## Algorithm testing
+
+The reusable algorithm library has been tested independently from the malware
+extraction pipeline.
+
+The test suite covers:
+
+```text
+Base16
+Base32
+Base45
+Base58
+Base64
+Base85
+RC4
+XOR repeating key
+XOR single byte
+Rolling XOR
+MD5
+SHA1
+SHA256
+AES
+DES
+3DES
+Blowfish
+ChaCha20
+ChaCha20-Poly1305
+```
+
+This separates algorithm correctness from malware-family-specific extraction
+logic.
+
+---
+
 ## Batch testing
 
 Multiple samples have been processed from a directory.
@@ -1520,12 +2130,14 @@ The current MVP provides:
 * individual string-instance extraction
 * normalized match representation
 
-### PE
+### PE / ELF
 
 * PE loading
+* ELF loading
 * section identification
 * RVA resolution
 * virtual address resolution
+* file-offset address resolution
 
 ### Reader
 
@@ -1542,7 +2154,19 @@ The current MVP provides:
 * analyst-controlled match selection
 * analyst-controlled byte interpretation
 * analyst-controlled extraction logic
+* analyst-controlled algorithm selection and chaining
 * generic result contract
+
+### Algorithms
+
+* Base16 / Base32 / Base45 / Base58 / Base64 / Base85
+* XOR / single-byte XOR / Rolling XOR
+* RC4
+* AES ECB / CBC / CTR
+* DES / 3DES
+* Blowfish
+* ChaCha20 / ChaCha20-Poly1305
+* MD5 / SHA1 / SHA256
 
 ### Output
 
@@ -1560,9 +2184,10 @@ The following responsibilities intentionally belong to the **core framework**:
 ```text
 CLI
 YARA
-PE parsing
+PE / ELF parsing
 match normalization
 sample reading
+algorithm implementations
 plugin loading
 result validation
 output
@@ -1574,6 +2199,9 @@ The following responsibilities intentionally belong to the **analyst plugin**:
 malware-family logic
 match selection
 byte interpretation
+algorithm selection
+algorithm order / chaining
+key / IV / nonce selection
 decryption
 decoding
 configuration identification
@@ -1629,6 +2257,7 @@ Possible future improvements include:
 * standardized extraction timestamps
 * improved JSON schema/versioning
 * additional executable format support
+* additional algorithm implementations
 * improved batch-processing controls
 * configuration deduplication
 * extraction statistics
