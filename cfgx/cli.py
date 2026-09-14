@@ -3,6 +3,14 @@ import json
 from pathlib import Path
 from .main import process_sample
 
+def json_serializer(obj):
+    if isinstance(obj, bytes):
+        return obj.decode("utf-8", errors="replace")
+
+    raise TypeError(
+        f"Object of type {type(obj).__name__} "
+        "is not JSON serializable"
+    )
 
 def validate_file(path, name):
     if not path.exists():
@@ -79,7 +87,12 @@ def main():
         output_file = output_dir / f"{sample.stem}_config.json"
 
         with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(result, f, indent=4)
+            json.dump(
+    result,
+    f,
+    indent=4,
+    default=json_serializer
+)
 
         print(f"\nSaved extraction to: {output_file}")
 
@@ -120,7 +133,7 @@ def main():
         output_file = output_dir / f"{rule.stem}.json"
 
         with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(all_results, f, indent=4)
+            json.dump(all_results,f,indent=4,default=json_serializer)
 
         print(f"\nSaved combined extraction to: {output_file}")
 

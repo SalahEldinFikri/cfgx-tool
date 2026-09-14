@@ -3,7 +3,9 @@ def read_bytes(sample_path, start, end=None):
         raise ValueError("Start offset cannot be negative")
 
     if end is not None and end < start:
-        raise ValueError("End offset cannot be smaller than start offset")
+        raise ValueError(
+            "End offset cannot be smaller than start offset"
+        )
 
     with open(sample_path, "rb") as f:
         f.seek(start)
@@ -15,8 +17,9 @@ def read_bytes(sample_path, start, end=None):
 
 
 class SampleReader:
-    def __init__(self, sample_path):
+    def __init__(self, sample_path, rva_to_offset=None):
         self._sample_path = sample_path
+        self._rva_to_offset = rva_to_offset
 
     def read(self, offset, size):
         if not isinstance(offset, int):
@@ -36,3 +39,17 @@ class SampleReader:
             offset,
             offset + size
         )
+
+    def rva_to_offset(self, rva):
+        if not isinstance(rva, int):
+            raise TypeError("RVA must be an integer")
+
+        if rva < 0:
+            raise ValueError("RVA cannot be negative")
+
+        if self._rva_to_offset is None:
+            raise ValueError(
+                "RVA to file offset conversion is not available"
+            )
+
+        return self._rva_to_offset(rva)
