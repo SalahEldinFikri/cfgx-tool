@@ -16,11 +16,8 @@ def run_yara(rule_path, sample_path) -> List[Match]:
     results: List[Match] = []
 
     for match in matches:
-
         for string in match.strings:
-
             for instance in string.instances:
-
                 results.append({
                     "rule": match.rule,
                     "identifier": string.identifier,

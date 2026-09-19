@@ -13,19 +13,7 @@ class PEMetadata(TypedDict):
     va: int
 
 
-class DataMetadata(TypedDict, total=False):
-    data: bytes
-    data_offset: int
-    data_rva: int
-    data_va: int
-    data_section: str
-
-
-class PEMatch(
-    Match,
-    PEMetadata,
-    DataMetadata
-):
+class PEMatch(Match, PEMetadata):
     pass
 
 

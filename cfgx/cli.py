@@ -40,7 +40,6 @@ def validate_sample_path(path):
 
 
 def main():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("rule")
@@ -68,11 +67,7 @@ def main():
     if not validate_file(decryptor, "Decryptor"):
         return
 
-    # ---------------------------------------------------------
-    # Single sample
-    # ---------------------------------------------------------
     if sample.is_file():
-
         try:
             result = process_sample(
                 rule,
@@ -87,13 +82,11 @@ def main():
         print("Extraction result:")
         print(result["config"])
 
-        # Create output directory
         output_dir.mkdir(
             parents=True,
             exist_ok=True
         )
 
-        # Save result using the sample name
         output_file = (
             output_dir /
             f"{sample.stem}_config.json"
@@ -115,17 +108,10 @@ def main():
             f"\nSaved extraction to: {output_file}"
         )
 
-    # ---------------------------------------------------------
-    # Sample directory
-    # ---------------------------------------------------------
     elif sample.is_dir():
-
         all_results = []
 
-        # rglob() recursively searches all subdirectories.
         for sample_file in sample.rglob("*"):
-
-            # Ignore directories.
             if not sample_file.is_file():
                 continue
 
@@ -163,13 +149,11 @@ def main():
                 "result": result
             })
 
-        # Create output directory
         output_dir.mkdir(
             parents=True,
             exist_ok=True
         )
 
-        # One combined JSON file for the directory
         output_file = (
             output_dir /
             f"{rule.stem}.json"

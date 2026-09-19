@@ -79,7 +79,7 @@ def process_sample(
             rule_path,
             sample_path
         )
-
+        
         processed_matches = []
 
         for match in matches:
@@ -91,6 +91,34 @@ def process_sample(
             offset = match[
                 "offset"
             ]
+
+            # -------------------------------------------------
+            # Preserve the actual YARA matched bytes.
+            #
+            # This is important for identifiers such as:
+            #
+            #     $rc4_32
+            #     $RC4_64
+            #
+            # The analyst plugin can use match["data"] directly.
+            # -------------------------------------------------
+
+            match_data = match.get(
+                "match_data"
+            )
+
+            if isinstance(
+                match_data,
+                bytes
+            ):
+
+                processed[
+                    "data"
+                ] = match_data
+
+            # -------------------------------------------------
+            # PE metadata and reference resolution
+            # -------------------------------------------------
 
             if sample_format == "pe":
 
@@ -105,11 +133,10 @@ def process_sample(
                         metadata
                     )
 
-                match_data = match.get(
-                    "match_data"
-                )
-
-                if match_data is not None:
+                if isinstance(
+                    match_data,
+                    bytes
+                ):
 
                     try:
 
@@ -168,6 +195,8 @@ def process_sample(
                             resolved_references[0]
                         )
 
+                        # If a referenced data object was found,
+                        # expose that data to the plugin.
                         if "data" in first_reference:
 
                             processed[
@@ -193,6 +222,10 @@ def process_sample(
                         ] = first_reference[
                             "va"
                         ]
+
+            # -------------------------------------------------
+            # ELF metadata
+            # -------------------------------------------------
 
             elif sample_format == "elf":
 

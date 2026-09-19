@@ -80,17 +80,6 @@ def resolve_rip_relative(
     match_offset,
     match_data
 ):
-    """
-    Resolve the first supported RIP-relative LEA
-    instruction found inside match_data.
-
-    Supported forms:
-
-        48 8D 0D ?? ?? ?? ??    lea rcx, [rip + disp32]
-        48 8D 15 ?? ?? ?? ??    lea rdx, [rip + disp32]
-        4C 8D 3D ?? ?? ?? ??    lea r15, [rip + disp32]
-    """
-
     patterns = (
         b"\x48\x8D\x0D",
         b"\x48\x8D\x15",
@@ -98,10 +87,7 @@ def resolve_rip_relative(
     )
 
     for pattern in patterns:
-
-        position = match_data.find(
-            pattern
-        )
+        position = match_data.find(pattern)
 
         if position == -1:
             continue
@@ -162,17 +148,6 @@ def resolve_rip_references(
     match_offset,
     match_data
 ):
-    """
-    Resolve all supported RIP-relative LEA references
-    found inside a YARA match.
-
-    Each result contains:
-
-        offset
-        rva
-        va
-    """
-
     patterns = (
         b"\x48\x8D\x0D",
         b"\x48\x8D\x15",
@@ -238,9 +213,7 @@ def resolve_rip_references(
         }
 
         if reference not in references:
-            references.append(
-                reference
-            )
+            references.append(reference)
 
     return references
 
@@ -250,19 +223,6 @@ def resolve_push_offset(
     match_offset,
     match_data
 ):
-    """
-    Resolve the first push imm32 reference found
-    inside match_data.
-
-    The immediate value is tested as both:
-
-        1. a VA
-        2. an RVA
-
-    This keeps the resolver independent of the
-    malware family using the reference.
-    """
-
     for position in range(
         len(match_data) - 4
     ):
@@ -284,14 +244,12 @@ def resolve_push_offset(
         )
 
         if target_rva is not None:
-
             target_offset = rva_to_offset(
                 pe,
                 target_rva
             )
 
             if target_offset is not None:
-
                 return {
                     "offset": target_offset,
                     "rva": target_rva,
@@ -306,7 +264,6 @@ def resolve_push_offset(
         )
 
         if target_offset is not None:
-
             return {
                 "offset": target_offset,
                 "rva": target_rva,
@@ -324,14 +281,6 @@ def resolve_push_references(
     match_offset,
     match_data
 ):
-    """
-    Resolve all push imm32 references found inside
-    match_data.
-
-    The immediate value is tested as both a VA and
-    an RVA.
-    """
-
     references = []
 
     for position in range(
@@ -355,14 +304,12 @@ def resolve_push_references(
         )
 
         if target_rva is not None:
-
             target_offset = rva_to_offset(
                 pe,
                 target_rva
             )
 
             if target_offset is not None:
-
                 reference = {
                     "offset": target_offset,
                     "rva": target_rva,
@@ -370,21 +317,17 @@ def resolve_push_references(
                 }
 
                 if reference not in references:
-                    references.append(
-                        reference
-                    )
+                    references.append(reference)
 
                 continue
 
         target_rva = target_value
-
         target_offset = rva_to_offset(
             pe,
             target_rva
         )
 
         if target_offset is not None:
-
             reference = {
                 "offset": target_offset,
                 "rva": target_rva,
@@ -395,9 +338,7 @@ def resolve_push_references(
             }
 
             if reference not in references:
-                references.append(
-                    reference
-                )
+                references.append(reference)
 
     return references
 
@@ -407,16 +348,6 @@ def resolve_reference(
     match_offset,
     match_data
 ):
-    """
-    Resolve the first valid reference found in
-    match_data.
-
-    This function is retained for compatibility
-    with callers that expect a single reference.
-
-    New code should prefer resolve_references().
-    """
-
     references = resolve_references(
         pe,
         match_offset,
@@ -434,19 +365,6 @@ def resolve_references(
     match_offset,
     match_data
 ):
-    """
-    Resolve all supported references found inside
-    a YARA match.
-
-    Currently supported reference types:
-
-        - RIP-relative LEA
-        - push imm32
-
-    The function is completely independent of
-    malware-family-specific YARA identifiers.
-    """
-
     if not isinstance(
         match_offset,
         int
@@ -501,7 +419,6 @@ def resolve_offset(
     pe,
     offset
 ) -> Optional[PEMetadata]:
-
     rva = offset_to_rva(
         pe,
         offset

@@ -4,7 +4,6 @@ from elftools.elf.elffile import ELFFile
 def load_elf(sample_path):
     f = open(sample_path, "rb")
     elf = ELFFile(f)
-
     return elf, f
 
 
@@ -23,7 +22,6 @@ def offset_to_elf_address(elf, offset):
 
         if section_offset <= offset < section_offset + section_size:
             address = section["sh_addr"] + (offset - section_offset)
-
             return {
                 "section": section.name,
                 "va": address

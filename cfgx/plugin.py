@@ -20,30 +20,16 @@ def load_decryptor(decryptor_path):
 
 
 def validate_result(result):
-
     if not isinstance(result, dict):
-        raise TypeError(
-            "extract() must return a dictionary"
-        )
+        raise TypeError("extract() must return a dictionary")
 
     if "status" not in result:
-        raise ValueError(
-            "Result must contain 'status'"
-        )
+        raise ValueError("Result must contain 'status'")
 
     if not isinstance(result["status"], str):
-        raise TypeError(
-            "Result 'status' must be a string"
-        )
+        raise TypeError("Result 'status' must be a string")
 
     if "config" not in result:
-        raise ValueError(
-            "Result must contain 'config'"
-        )
-
-    # An extractor can complete successfully without
-    # actually finding any configuration.
-    if not result["config"]:
-        result["status"] = "nothing_found"
+        raise ValueError("Result must contain 'config'")
 
     return result
