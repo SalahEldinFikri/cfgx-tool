@@ -1,0 +1,15 @@
+{
+  "schema": "cfgx/1",
+  "tool": "cfgx 0.2.1",
+  "sample": {
+    "path": "D:\\Data\\blog\\malwares\\da9087854e915a953fc6bd966efacee6475f9ef7cd93116bd3a3a2329fc34377",
+    "name": "da9087854e915a953fc6bd966efacee6475f9ef7cd93116bd3a3a2329fc34377"
+  },
+  "status": "error",
+  "rules": [],
+  "config": [],
+  "warnings": [],
+  "errors": [
+    "OSError: [Errno 22] Invalid argument: 'D:\\\\Data\\\\blog\\\\malwares\\\\da9087854e915a953fc6bd966efacee6475f9ef7cd93116bd3a3a2329fc34377'"
+  ]
+}

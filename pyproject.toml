@@ -4,22 +4,26 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cfgx"
-version = "0.1.0"
-description = "A malware configuration extraction framework"
-requires-python = ">=3.12"
+version = "0.3.0"
+description = "YARA-driven malware configuration extraction: the rule finds the data, a tiny plugin decrypts it."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
 dependencies = [
-    "yara-python>=4.5.0",
-    "pefile>=2024.8.26",
-    "pyelftools>=0.32",
-    "pycryptodome>=3.20.0",
+    "yara-python>=4.3",
+    "pefile",
+    "pyelftools",
+    "pycryptodome",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest"]
 
 [project.scripts]
 cfgx = "cfgx.cli:main"
 
 [tool.setuptools.packages.find]
-include = [
-    "cfgx*",
-    "formats*",
-    "yara_handler*",
-]
+include = ["cfgx*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
