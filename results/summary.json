@@ -1,0 +1,22 @@
+[
+  {
+    "sample": "D:\\Data\\blog\\malwares\\2026-07-03_e1b807c2d7b670f8b7ba75df1fc4dbdd_cobalt-strike_icedid_luca-stealer_njrat_satacom_stealc",
+    "status": "error",
+    "rules": []
+  },
+  {
+    "sample": "D:\\Data\\blog\\malwares\\da9087854e915a953fc6bd966efacee6475f9ef7cd93116bd3a3a2329fc34377",
+    "status": "error",
+    "rules": []
+  },
+  {
+    "sample": "D:\\Data\\blog\\malwares\\file",
+    "status": "error",
+    "rules": []
+  },
+  {
+    "sample": "D:\\Data\\blog\\malwares\\stealc",
+    "status": "error",
+    "rules": []
+  }
+]

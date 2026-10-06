@@ -1,0 +1,15 @@
+{
+  "schema": "cfgx/1",
+  "tool": "cfgx 0.2.1",
+  "sample": {
+    "path": "D:\\Data\\blog\\malwares\\file",
+    "name": "file"
+  },
+  "status": "error",
+  "rules": [],
+  "config": [],
+  "warnings": [],
+  "errors": [
+    "OSError: [Errno 22] Invalid argument: 'D:\\\\Data\\\\blog\\\\malwares\\\\file'"
+  ]
+}
